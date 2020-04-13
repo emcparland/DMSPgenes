@@ -2,9 +2,9 @@
 
 ## Download local blast if you don't have it already with conda
 
-```conda create --name localblasting
-conda install -c bioconda blast
-conda activate localblasting```
+```conda create --name localblasting```
+```conda install -c bioconda blast```
+```conda activate localblasting```
 
 # tblastn DMSP synthesis genes to survey eukaryotes in MMETSP transcriptomes
 The MMETSP is the most diverse database of marine protists. Here, I'm using the most up to date MMETSP transcriptomes, which were reanalyzed by Johnson et al. and includes transcriptomes (n=678) from primarily cultured unique strains (n=395) (some transcriptomes are from the same organism in different culturing conditions). 
@@ -111,18 +111,18 @@ As we know the MMETSP transcriptomes were not axenic, we wanted to check if any 
 
 ```srun -p scavenger --time=02:00:00 --ntasks-per-node=6 --mem=8gb --pty bash```
 
-```tblastn -db nr -query TpMT2_final.fa -remote -out TpMT2_reblast.txt -max_hsps 1 -max_target_seqs 100 -outfmt "6 qseqid qlen sseqid sskingdoms slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score"```
+```tblastn -db nr -query TpMT2_final.fa -remote -out TpMT2_reblast.txt -max_hsps 1 -max_target_seqs 100 -outfmt "6 qseqid qlen sseqid slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score"```
 
-```tblastn -db nr -query DSYB_uniqsp.fa -remote -out DSYB_reblast.txt -max_hsps 1 -max_target_seqs 100 -outfmt "6 qseqid qlen sseqid sskingdoms slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score"```
+```tblastn -db nr -query DSYB_uniqsp.fa -remote -out DSYB_reblast.txt -max_hsps 1 -max_target_seqs 100 -outfmt "6 qseqid qlen sseqid slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score"```
 
 Get the id's and search on [batch entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez)
-```cat DSYB_reblast_all.txt | cut -f3 | awk -F \| '{print $4}' |sort | uniq >tmp.txt```
+```cat *_reblast_all.txt | cut -f3 | awk -F \| '{print $4}' |sort | uniq >tmp.txt```
 Download summary file and pull out names
 ```awk 'NR%4==1' tmp_summary.txt | awk -F" " '{print $2,$3}' >tmp_taxon.txt```
 Then search for [taxon id](https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi)
 ```awk -F\| '{print $4}' tax_report.txt >taxid_search.txt```
 Retrieve taxonomy from batch entrez again and download summary to get taxonomy result, then parse to make easily searchable
-```awk 'NR%2==1' taxonomy_result.txt | awk -F" " '{print $2,$3}' >tmp1```
+```awk 'NR%2==1' taxonomy_result.txt | awk -F" " '{print $2,$3}' > tmp1```
 ```awk 'NR%2==0' taxonomy_result.txt |awk -F"," '{print $2}' > tmp2```
 ```paste tmp1 tmp2 > search1.txt```
 
@@ -133,14 +133,6 @@ Get list of accession numbers and species names
 Clean up
 ```rm tmp*```
 
-cut -f1 DSYB_reblast_all.txt | sort | uniq > uniq_species.txt
-
-
-
-
-awk '{print $1}' uniq_species.txt | while read headername
-do
-grep $headername DSYB_reblast_all.txt | cut -f3 | awk -F\| '{print $4}'
 
 
 
