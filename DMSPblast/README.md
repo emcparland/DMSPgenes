@@ -47,7 +47,7 @@ Note that this script:
 - Transcribes the names in blast results (which are just mmetsp ids and contig numbers) to MMETSP id and species name. 
 - Some MMETSP species had multiple hits for the same protein (particularly DSYB because I searched with more than one query sequence). If the length of the output is > the length of the unique subject names then this script also filters to produce just one hit for each MMETSP id (the 'best' hit for each MMETSP id is chosen based on highest e-value, then highest query coverage). This produces a txt file named with your gene of interest (e.g. DSYB_uniq.txt). 
 - Finally if a species has multiple MMETSP id's (meaning it was grown in different conditions and the resulting transcriptomes are represented in database) then filters to keep the top hit for each species (again chosen based on highest e-value, then highest query coverage). This produces an additional txt file (e.g. DSYB_uniqsp.txt)*.
-- *This is information that could be of importance so make sure to edit a script like this to reflect your scientific questions.
+ *This is information that could be of importance so make sure to edit a script like this to reflect your scientific questions.
 
 # For the prokaryotes
 
@@ -61,11 +61,11 @@ Note that this script:
 
 ## Need to get readable names for hits (output gives NZ id's)
 Get the names of your significant hits
-```awk '$13 <=1e-30 && $16 >=0.7' dsyb_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' > prok_search.txt
-awk '$13 <=1e-30 && $16 >=0.7' tpmt2_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt
-awk '$13 <=1e-30 && $16 >=0.7' tpmt1_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt
-sort prok_search.txt | uniq > Prok_NZ_search.txt
-rm prok_search.txt```
+```awk '$13 <=1e-30 && $16 >=0.7' dsyb_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' > prok_search.txt```
+```awk '$13 <=1e-30 && $16 >=0.7' tpmt2_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt```
+```awk '$13 <=1e-30 && $16 >=0.7' tpmt1_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt```
+```sort prok_search.txt | uniq > Prok_NZ_search.txt```
+```rm prok_search.txt```
 
 Search in nucleotide database on NCBI with [batch entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez)
 ```grep "^>" sequencetmp.fasta | awk -F" " '{print $1,$2,$3}' > refprokids.txt
