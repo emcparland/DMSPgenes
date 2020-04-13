@@ -90,12 +90,15 @@ Note that this script:
 
 # Add manual searches
 Here I also added a few manual searches that weren't represented in MMETSP (see Methods in paper for details).
-```cat dsybprok_uniqsp.txt extra_proks_sig.txt
-cat DSYB_uniqsp.txt extra_DSYB_sig.txt
-cat tpmt2_uniqsp.txt extra_TpMT2_sig.txt```
+```cat dsybprok_uniqsp.txt extra_proks_sig.txt```
+
+```cat DSYB_uniqsp.txt extra_DSYB_sig.txt```
+
+```cat tpmt2_uniqsp.txt extra_TpMT2_sig.txt```
 
 # Cat proks and euks together and make fasta files
 ```cat DSYB_uniqsp.txt dsybprok_uniqsp.txt > DSYB_final.txt```
+
 (There are no prok sequences for TpMT2)
 ```cp tpmt2_uniqsp.txt TpMT2_final.txt```
 
