@@ -89,6 +89,7 @@ Note that this script:
 *TpMT2 had no significant prokaryote hits*
 
 # Add manual searches
+
 Here I also added a few manual searches that weren't represented in MMETSP (see Methods in paper for details).
 ```cat dsybprok_uniqsp.txt extra_proks_sig.txt```
 
@@ -100,6 +101,7 @@ Here I also added a few manual searches that weren't represented in MMETSP (see 
 ```cat DSYB_uniqsp.txt dsybprok_uniqsp.txt > DSYB_final.txt```
 
 (There are no prok sequences for TpMT2)
+
 ```cp tpmt2_uniqsp.txt TpMT2_final.txt```
 
 This command will grab your headers and sequences, remove any "-" in the MMETSP sequences, and print a fasta file with >
@@ -125,21 +127,26 @@ As we know the MMETSP transcriptomes were not axenic, we wanted to check if any 
 
 Get the id's and search on [batch entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez)
 ```cat *_reblast_all.txt | cut -f3 | awk -F \| '{print $4}' |sort | uniq >tmp.txt```
+
 Download summary file and pull out names
 ```awk 'NR%4==1' tmp_summary.txt | awk -F" " '{print $2,$3}' >tmp_taxon.txt```
+
 Then search for [taxon id](https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi)
 ```awk -F\| '{print $4}' tax_report.txt >taxid_search.txt```
+
 Retrieve taxonomy from batch entrez again and download summary to get taxonomy result, then parse to make easily searchable
 ```awk 'NR%2==1' taxonomy_result.txt | awk -F" " '{print $2,$3}' > tmp1```
+
 ```awk 'NR%2==0' taxonomy_result.txt |awk -F"," '{print $2}' > tmp2```
+
 ```paste tmp1 tmp2 > search1.txt```
 
 Now run a for loop to assign kingdom to blast hit:
 Get list of accession numbers and species names
 ```awk 'NR%4==3' tmp_summary.txt | awk -F" " '{print $1}' >tmp_accesion.txt```
+
 ```paste tmp_accesion.txt tmp_taxon.txt >search2.txt```
-Clean up
-```rm tmp*```
+Clean up ```rm tmp*```
 
 
 
