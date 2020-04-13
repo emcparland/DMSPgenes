@@ -62,14 +62,19 @@ Note that this script:
 ## Need to get readable names for hits (output gives NZ id's)
 Get the names of your significant hits
 ```awk '$13 <=1e-30 && $16 >=0.7' dsyb_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' > prok_search.txt```
+
 ```awk '$13 <=1e-30 && $16 >=0.7' tpmt2_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt```
+
 ```awk '$13 <=1e-30 && $16 >=0.7' tpmt1_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' >> prok_search.txt```
+
 ```sort prok_search.txt | uniq > Prok_NZ_search.txt```
+
 ```rm prok_search.txt```
 
 Search in nucleotide database on NCBI with [batch entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez)
-```grep "^>" sequencetmp.fasta | awk -F" " '{print $1,$2,$3}' > refprokids.txt
-rm Prok_NZ_search.txt```
+```grep "^>" sequencetmp.fasta | awk -F" " '{print $1,$2,$3}' > refprokids.txt```
+
+```rm Prok_NZ_search.txt```
 
 ## Clean up results
 *I again kept results if they passed a criterion of e-value <= 1e-30 and query coverage >=70%*
