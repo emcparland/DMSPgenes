@@ -8,7 +8,7 @@ I used the alignment files created for the phylogenetic trees to build the hmm p
 
 ```hmmbuild TpMT2.hmm TpMT2_align_final.fa```
 
-http://tara-oceans.mio.osupytheas.fr/ocean-gene-atlas/results?id=5e99e31a11587 
-http://tara-oceans.mio.osupytheas.fr/ocean-gene-atlas/results?id=5e99ded3c75a0
+I then used the [Ocean Gene Atlas](http://tara-oceans.mio.osupytheas.fr/ocean-gene-atlas/) to search for an hmm profile search of the MATOU (eukaryotic Unigenes built from metatranscriptomes)
 
-
+The Ocean Gene Atlas: exploring the biogeography of plankton genes online. E. Villar, T. Vannier, C. Vernette, M. Lescot, M. Cuenca, A. Alexandre, P. Bachelerie, T. Rosnet, E. Pelletier, S. Sunagawa, P. Hingamp. (2018) Nucleic Acids Research. 
+doi: 10.1093/nar/gky376

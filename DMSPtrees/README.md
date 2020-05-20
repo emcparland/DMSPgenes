@@ -10,11 +10,12 @@ Make alignment with all sequences:
 ```muscle -in all_final.fa -out all_align.fa -seqtype protein```
 
 Make alignment with only sequences with a phenotype and genotype:
-```awk '{print $1}' names_phenogeno.txt | while read headername
-do
-	grep -A 1 $headername DSYB_final.fa >> all_pheno.fa
-	grep -A 1 $headername TpMT2_final.fa >> all_pheno.fa
-done```
+
+```awk '{print $1}' names_phenogeno.txt | while read headername```
+```do```
+```	grep -A 1 $headername DSYB_final.fa >> all_pheno.fa```
+```	grep -A 1 $headername TpMT2_final.fa >> all_pheno.fa```
+```done```
 
 ```muscle -in all_pheno.fa -out all_pheno_align.fa -seqtype protein```
 
