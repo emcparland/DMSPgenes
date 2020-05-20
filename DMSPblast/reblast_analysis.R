@@ -11,13 +11,17 @@ kingdom_search$kingdom[idx]<-"Prokaryote"
 idx<-grep("ants|aphids|ascomycetes|bats|basidiomycetes|beetles|bony fishes|choanoflagellates|crustaceans|cryptomonads|diatoms|dinoflagellates|eudicots|eukaryotes|flies|frogs & toads|gastropods|green algae|haptophytes|hemichordates|hydrozoans|lizards|moths|pelagophytes|priapulids|red algae|rodents|sea anemones|segmented worms|snakes|soft corals|species|springtails|stony corals|termites|wasps",kingdom_search$kingdom)
 kingdom_search$kingdom[idx]<-"Eukaryote"
 
+# Read in table and keep only columns of interest
 DSYB_reblast_all<-read.delim(file="DSYB_reblast_all.txt",header=F,sep = " ")
 idx<-c(1,3,5,13)
 DSYB_reblast_all<-DSYB_reblast_all[,idx]
 colnames(DSYB_reblast_all)<-c("qseqid","sseqid","pident","evalue")
 DSYB_reblast_all$kingdom<-NA
+
+# Filter by evalue
 DSYB_reblast_all<-DSYB_reblast_all[which(DSYB_reblast_all$evalue<1e-30),]
 
+# Add column for kingdoms
 for (i in 1: dim(DSYB_reblast_all)[1]){
   accid<-unlist(strsplit(as.character(DSYB_reblast_all$sseqid[i]),"\\|"))[4]
   species<-accession_search$speciesname[grep(accid,accession_search$accession)]
@@ -28,6 +32,7 @@ for (i in 1: dim(DSYB_reblast_all)[1]){
   if(length(kingdom)>1){print(c(i,kingdom))}
 }
 
+# Create df that sums the euks, proks for each unique search id
 DSYB_uniq<-as.data.frame(unique(sort(DSYB_reblast_all$qseqid)))
 colnames(DSYB_uniq)<-"MMETSPname"
 DSYB_uniq$eukno<-NA
@@ -41,13 +46,15 @@ for (i in 1:dim(DSYB_uniq)[1]){
   
 }  
 
-# Remove hits that with perpro > 95%
+# Remove hits that with perpro < 97%
 contam<-as.character(DSYB_uniq$MMETSPname[which(DSYB_uniq$perpro>97)])
 idx<-which(DSYB_reblast_all$qseqid==contam[1]|DSYB_reblast_all$qseqid==contam[2]|
              DSYB_reblast_all$qseqid==contam[3]|DSYB_reblast_all$qseqid==contam[4])
 DSYB_reblast_all<-DSYB_reblast_all[-idx,]
 ggplot(DSYB_reblast_all,aes(x=pident,fill=kingdom))+geom_density()+ggtitle("DSYB")
 
+range(DSYB_reblast_all$pident[which(DSYB_reblast_all$kingdom=="Eukaryote")])
+range(DSYB_reblast_all$pident[which(DSYB_reblast_all$kingdom=="Prokaryote")])
 
 
 

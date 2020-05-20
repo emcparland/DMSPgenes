@@ -6,7 +6,7 @@ library(reshape2)
 library(rlang)
 library(Hmisc)
 
-setwd("~/DMSPsynBLAST/")
+setwd("~/DMSPgenes/DMSPblast/")
 
 pheno_full<-read.csv("PhenotypeList.csv")
 colnames(pheno_full)<-c("DMSPType","Kingdom","Group","Phylum","Class","Species",
@@ -117,7 +117,7 @@ hbar1<-
   ggplot(pheno_tot,aes(x=Names,y=variable,fill=Names))+
   geom_col(position="dodge",width=0.25)+
   labs(title="Phenotype")+
-  ylim(c(0,125))+
+  ylim(c(0,160))+
   theme_minimal()+
   scale_fill_manual(values=c("red2","royalblue","black","grey"))+
   theme(axis.title=element_blank(),
@@ -163,6 +163,7 @@ idx<- which(geno_full$order=="Actinobacteria"); geno_full$order[idx]<-"Other Pro
 idx<- which(geno_full$order=="Firmicutes"); geno_full$order[idx]<-"Other Prokaryotes"
 idx<- which(geno_full$order=="Acidobacteria"); geno_full$order[idx]<-"Other Prokaryotes"
 idx<- which(geno_full$order=="Deltaproteobacteria"); geno_full$order[idx]<-"Other Prokaryotes"
+idx <- which(geno_full$MMETSPstrain=="Nostoc sp."); geno_full$order[idx]<-"Other Cyanobacteria"
 
 geno_full$TpMT1<-NULL
 
@@ -180,12 +181,15 @@ for(i in 1:dim(geno_full)[1]){
 
 # Here I'm adding in numbers based on refseq prok totals
 a<-c(0,0,"","Alphaproteobacteria","Prokaryote",0,78)
-c<-c(0,0,"","Other Cyanobacteria","Prokaryote",0,18)
+c<-c(0,0,"","Other Cyanobacteria","Prokaryote",0,11)
+p<-c(0,0,"","Prochlorococcus","Prokaryote",0,7)
+s<-c(0,0,"","Synechococcus","Prokaryote",0,0)
+t<-c(0,0,"","Trichodesmium","Prokaryote",0,0)
 g<-c(0,0,"","Gammaproteobacteria","Prokaryote",0,183)
 o<-c(0,0,"","Other Prokaryotes","Prokaryote",0,873)
 
 geno_full$MMETSPstrain<-as.character(geno_full$MMETSPstrain)
-geno_full<- rbind(geno_full,a,c,g,o)
+geno_full<- rbind(geno_full,a,c,p,s,t,g,o)
 geno_full$DSYB<-as.numeric(geno_full$DSYB);geno_full$TpMT2<-as.numeric(geno_full$TpMT2)
 geno_full$TpMT2_DSYB<-as.numeric(geno_full$TpMT2_DSYB);geno_full$None<-as.numeric(geno_full$None)
 
@@ -200,8 +204,6 @@ geno_table_sum <- geno_full %>%
   group_by(generic) %>%
   summarise_each(funs(sum)) %>%
   mutate(tot=DSYB+TpMT2+TpMT2_DSYB+None)
-  
-write.csv(x=cbind(pheno_table_sum,geno_table_sum[,2:7]),"phenogeno_sum.csv")
 
 geno_forplot<-geno_table %>%
   select(DSYB,TpMT2,TpMT2_DSYB,None,order) %>%
@@ -305,8 +307,34 @@ hbar2<-
         panel.grid = element_blank(),
         plot.margin = margin(0,0,0,0,"cm"))
 
-# Correlation of pheno and geno
+## Table 1
+rows <- c("Prokaryote","Dinophyta","Haptophyta","Chlorophyta","Bacillariophyta",
+          "Pelagophyta","Stramenopiles","Cryptophyta","Rhizaria","Other")
 
+table1 <- bind_cols(pheno_table_sum,geno_table_sum[,2:6]) %>%
+  # phenotype
+  mutate(perHi=(HiDP/(HiDP+LoDP))*100) %>%
+  mutate(perLo=(LoDP/(HiDP+LoDP))*100) %>%
+  mutate(nPheno=HiDP+LoDP) %>%
+  mutate(perdet=(det/(det+bd))*100) %>%
+  mutate(perbd=(bd/(det+bd))*100) %>%
+  mutate(ndet=det+bd) %>%
+  mutate(totPheno=HiDP+LoDP+det+bd) %>%
+  # genotype
+  mutate(perDSYB=(DSYB/tot)*100) %>%
+  mutate(perTpMT2=(TpMT2/tot)*100) %>%
+  mutate(perTpMT2_DSYB=(TpMT2_DSYB/tot)*100) %>%
+  mutate(perNone=(None/tot)*100) %>%
+  mutate(totGeno=tot) %>%
+  select(Generic,totPheno,ndet,perdet,perbd,nPheno,perHi,perLo,totGeno,perDSYB,perTpMT2,perTpMT2_DSYB,perNone) %>%
+  slice(match(rows, Generic))
+  
+write.csv(x=table1,"Table1.csv")
+
+
+
+
+## Correlation of pheno and geno
 pgcorr<-as.data.frame(geno_full$MMETSPstrain)
 colnames(pgcorr)<-"strain"
 pgcorr$HiDP<-NA
@@ -342,5 +370,4 @@ pgcorr<-pgcorr[which(!is.na(pgcorr$HiDP) & !is.na(pgcorr$LoDP)),]
 # Remove genotype for None
 pgcorr<-pgcorr[which(!is.na(pgcorr$DSYB) & !is.na(pgcorr$TpMT2orBoth)),]
 rcorr(as.matrix(pgcorr[,2:5]))
-
 

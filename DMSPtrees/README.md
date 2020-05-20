@@ -5,6 +5,20 @@ Install: [muscle](https://www.drive5.com/muscle/) with conda and [RAxML](https:/
 ```muscle -in DSYB_final.fa -out DSYB_align.fa -seqtype protein```
 ```muscle -in TpMT2_final.fa -out TpMT2_align.fa -seqtype protein```
 
+Make alignment with all sequences:
+```cat DSYB_final.fa TpMT2_final.fa > all_final.fa```
+```muscle -in all_final.fa -out all_align.fa -seqtype protein```
+
+Make alignment with only sequences with a phenotype and genotype:
+```awk '{print $1}' names_phenogeno.txt | while read headername
+do
+	grep -A 1 $headername DSYB_final.fa >> all_pheno.fa
+	grep -A 1 $headername TpMT2_final.fa >> all_pheno.fa
+done```
+
+```muscle -in all_pheno.fa -out all_pheno_align.fa -seqtype protein```
+
+
 # Step 2: Trim with Geneious or Jalview and refine alignment
 ```muscle -in DSYB_align_trim.fa -out DSYB_align_final.fa -seqtype protein -refine```
 ```muscle -in TpMT2_align_trim.fa -out TpMT2_align_final.fa -seqtype protein -refine```
