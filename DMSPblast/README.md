@@ -12,7 +12,7 @@
 
 ```tblastn -query TpMT1.fa -remote -db ref_prok_rep_genomes -max_target_seqs 500 -out tpmt1_refprokgen_blastraw.txt -outfmt "6 qseqid qlen sseqid slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score sseq"```
 
-## Need to get readable names for hits (output gives NZ id's)
+### Need to get readable names for hits (output gives NZ id's)
 Get the names of your significant hits
 ```awk '$13 <=1e-30 && $16 >=0.7' dsyb_refprokgen_blastraw.txt | cut -f3 | awk -F\| '{print $4}' > prok_search.txt```
 
@@ -29,7 +29,7 @@ Search in nucleotide database on NCBI with [batch entrez](https://www.ncbi.nlm.n
 
 ```rm Prok_NZ_search.txt```
 
-## Clean up results
+### Clean up results
 *For prokaryotes, I kept results if they passed a criterion of e-value <= 1e-30 and query coverage >=70%*
 
 Run shell script, input raw tblastn results and tell it name of gene you want to label files with:
@@ -46,13 +46,13 @@ this script:
 # Survey eukaryotes in MMETSP transcriptomes
 The MMETSP is the most diverse database of marine protists. Here, I'm using the most up to date MMETSP transcriptomes, which were reanalyzed by Johnson et al. and includes transcriptomes (n=678) from primarily cultured unique strains (n=395) (some transcriptomes are from the same organism in different culturing conditions). 
 
-## Download local blast if you don't have it already with conda
+### Download local blast if you don't have it already with conda
 
 ```conda create --name localblasting```
 ```conda install -c bioconda blast```
 ```conda activate localblasting```
 
-## Create custom blast db with MMETSP transcriptomes
+### Create custom blast db with MMETSP transcriptomes
 Download all of the transcriptomes (I used the [zenodo-get](https://zenodo.org/record/1261813#.XhkWCC-ZPq0) python script which will recursively download all of the transcriptomes)
 ```zenodo_get.py -r 1212585```
 
@@ -167,7 +167,7 @@ We wanted to check if any of the MMETSP sequences could be prokaryote contaminat
 ```blastp -db nr -query tmp.fa -remote -out result.txt -max_hsps 1 -max_target_seqs 100 -outfmt "6 qseqid qlen sseqid slen pident length mismatch gapopen qstart qend sstart send evalue bitscore score"```
 ```cat result.txt >> "$gene"_reblast.txt```
 
-## Assign taxonomy 
+### Assign taxonomy 
 I usedthe R package[Taxonomzir](https://cran.r-project.org/web/packages/taxonomizr/index.html). This requires some previous setup and long downloads.
 ```library(taxonomizr)```
 ```results <- read.delim("TpMT2_reblast.txt", header = F,stringAsFactors=F)```

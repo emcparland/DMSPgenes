@@ -35,8 +35,8 @@ pheno_table_sum <- pheno_full  %>%
 
 pheno_forplot<-pheno_table %>%
   select(HiDP,LoDP,det,bd,Genus) %>%
-  mutate(det_bd=det+bd) %>%
-  select(HiDP,LoDP,det,det_bd,Genus) %>%
+  #mutate(det_bd=det+bd) %>%
+  select(HiDP,LoDP,det,bd,Genus) %>%
   mutate_at(vars(-Genus),funs(./pheno_table$tot)) %>%
   melt(id="Genus")
 pheno_forplot$Genus<-factor(pheno_forplot$Genus,levels=c("Alphaproteobacteria","Gammaproteobacteria",
@@ -165,8 +165,6 @@ idx<- which(geno_full$order=="Acidobacteria"); geno_full$order[idx]<-"Other Prok
 idx<- which(geno_full$order=="Deltaproteobacteria"); geno_full$order[idx]<-"Other Prokaryotes"
 idx <- which(geno_full$MMETSPstrain=="Nostoc sp."); geno_full$order[idx]<-"Other Cyanobacteria"
 
-geno_full$TpMT1<-NULL
-
 # Add columns for no genes and DSYB+TpMT2 genotype
 geno_full$TpMT2_DSYB<-0
 geno_full$None<-0
@@ -193,6 +191,21 @@ geno_full<- rbind(geno_full,a,c,p,s,t,g,o)
 geno_full$DSYB<-as.numeric(geno_full$DSYB);geno_full$TpMT2<-as.numeric(geno_full$TpMT2)
 geno_full$TpMT2_DSYB<-as.numeric(geno_full$TpMT2_DSYB);geno_full$None<-as.numeric(geno_full$None)
 
+# Remove contaminants based on reblast-analysis
+for (i in 1: dim(DSYB_contam)[1]){
+  idx <- grep(DSYB_contam$isolate[i], geno_full$MMETSPstrain)
+  print(idx)
+  geno_full$DSYB[idx] <- 0
+  geno_full$None[idx] <- 1
+}
+
+for (i in 1: dim(TpMT2_contam)[1]){
+  idx <- grep(TpMT2_contam$isolate[i], geno_full$MMETSPstrain)
+  print(idx)
+  geno_full$TpMT2[idx] <- 0
+  geno_full$None[idx] <- 1
+}
+
 geno_table<- geno_full %>%
   select(order,DSYB,TpMT2,TpMT2_DSYB,None) %>%
   group_by(order) %>%
@@ -207,8 +220,8 @@ geno_table_sum <- geno_full %>%
 
 geno_forplot<-geno_table %>%
   select(DSYB,TpMT2,TpMT2_DSYB,None,order) %>%
-  mutate(TpMT2_tot=TpMT2+TpMT2_DSYB) %>%
-  select(DSYB,TpMT2,TpMT2_tot,None,order) %>%
+  #mutate(TpMT2_tot=TpMT2+TpMT2_DSYB) %>%
+  select(DSYB,TpMT2,TpMT2_DSYB,None,order) %>%
   mutate_at(vars(-order),funs(./geno_table$tot)) %>%
   melt(id="order")
 geno_forplot$order<-factor(geno_forplot$order,levels=c("Alphaproteobacteria","Gammaproteobacteria",

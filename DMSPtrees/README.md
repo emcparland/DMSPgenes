@@ -1,32 +1,37 @@
 
 Install: [muscle](https://www.drive5.com/muscle/) with conda and [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/)
 
-# Step 1: Align sequences with muscle
-```muscle -in DSYB_final.fa -out DSYB_align.fa -seqtype protein```
-```muscle -in TpMT2_final.fa -out TpMT2_align.fa -seqtype protein```
+# Step 1: Align all sequences with muscle
+
+```cat DSYBall_hmmuniqsp.fa TpMT2_hmmuniqsp.fa > all_final.fa```
+
+Transcribe ORF names to MMETSP species
+```awk '{print $1}' mmetspids.txt | while read headername```
+```do```
+```search=`(echo $headername | awk -F "\|" '{print $1}')` ```
+```sed -i -e "s/$search.*/$headername/g" all_final.fa```
+```done```
 
 Make alignment with all sequences:
-```cat DSYB_final.fa TpMT2_final.fa > all_final.fa```
 ```muscle -in all_final.fa -out all_align.fa -seqtype protein```
 
 Make alignment with only sequences with a phenotype and genotype:
 
 ```awk '{print $1}' names_phenogeno.txt | while read headername```
 ```do```
-```	grep -A 1 $headername DSYB_final.fa >> all_pheno.fa```
-```	grep -A 1 $headername TpMT2_final.fa >> all_pheno.fa```
+```search=`(echo $headername | awk -F "|" '{print $2}')` ```
+```grep -A1 $search all_final.fa >> all_pheno.fa```
 ```done```
 
 ```muscle -in all_pheno.fa -out all_pheno_align.fa -seqtype protein```
 
-
 # Step 2: Trim with Geneious or Jalview and refine alignment
-```muscle -in DSYB_align_trim.fa -out DSYB_align_final.fa -seqtype protein -refine```
-```muscle -in TpMT2_align_trim.fa -out TpMT2_align_final.fa -seqtype protein -refine```
+```muscle -in all_align.fa -out all_align_final.fa -seqtype protein -refine```
+```muscle -in all_pheno_align.fa -out all_pheno_align_final.fa -seqtype protein -refine```
 
 Convert to phylip file for raxml
-```perl Fasta2Phylip.pl DSYB_align_final.fa DSYB_align_final.phy```
-```perl Fasta2Phylip.pl TpMT2_align_final.fa TpMT2_align_final.phy```
+```perl Fasta2Phylip.pl all_align_final.fa all_align_final.phy```
+```perl Fasta2Phylip.pl all_pheno_align_final.fa all_pheno_align_final.phy```
 
 # Step 3: Build tree with RAXML
 
