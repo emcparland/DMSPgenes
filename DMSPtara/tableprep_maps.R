@@ -5,7 +5,7 @@ make_maps<-0
 #Load required libraries
 library(reshape2)
 library(ggplot2)
-library(pheatmap)
+#library(pheatmap)
 library(RColorBrewer)
 library(vsn)
 library(hexbin)
@@ -16,15 +16,15 @@ library(gridExtra)
 library(rlang)
 
 ## load tables
-gene <- "TpMT2"
+gene <- "DSYB"
 if (gene == "DSYB"){
-  env_csv <- "mapped_reads/environmental_parameters_DSYB.csv"
-  aln_tsv <- "mapped_reads/OceanGeneAtlas_20200503-19_22_DSYB_aln_result.tsv"
-  abund_csv <- "mapped_reads/abundance_matrix_DSYB.csv"}
+  env_csv <- "environmental_parameters_DSYB.csv"
+  aln_tsv <- "OceanGeneAtlas_20201123-22_51_DSYB_aln_result.tsv"
+  abund_csv <- "abundance_matrix_DSYB.csv"}
 if (gene =="TpMT2"){
-  env_csv <- "mapped_reads/environmental_parameters_TpMT2.csv"
-  aln_tsv <- "mapped_reads/OceanGeneAtlas_20200503-19_26_TpMT2_aln_result.tsv"
-  abund_csv <- "mapped_reads/abundance_matrix_TpMT2.csv"}
+  env_csv <- "environmental_parameters_TpMT2.csv"
+  aln_tsv <- "OceanGeneAtlas_20201123-22_55_TpMT2_aln_result.tsv"
+  abund_csv <- "abundance_matrix_TpMT2.csv"}
 
 # create env data 
 env<-read.delim(file = env_csv, sep="\t", header=TRUE,skip=0)
@@ -43,7 +43,7 @@ tmp <- tmp[which(tmp == "MATOU-v1")+1]
 aln$subject_id <- paste0("MATOU-v1_",tmp)
 
 # keep only hits with evalue < 1e-20
-idx <- which(aln$e_value > 1e-20)
+idx <- which(aln$e_value > 1e-30)
 
 for (i in 1: length(idx)){
   j <- which(as.character(taxa$Gene_ID) %in% aln$subject_id[idx[i]])
@@ -65,13 +65,13 @@ abund <- abund[,which(colnames(abund) %in% env$sample_ID)]
 
 ## Remove metazoa
 idx <- grep("Metazoa", taxa$taxonomy)
-taxa <- taxa[-c(idx),]
-abund <- abund[-c(idx),]
+if(is_empty(idx)==F){taxa <- taxa[-c(idx),]
+abund <- abund[-c(idx),]}
 
 ## Remove bacteria
 idx <- grep("Bacteria", taxa$taxonomy)
-taxa <- taxa[-c(idx),]
-abund <- abund[-c(idx),]
+if(is_empty(idx)==F){taxa <- taxa[-c(idx),]
+abund <- abund[-c(idx),]}
 
 ## Drop levels
 env$depth <- droplevels(env$depth)
@@ -127,7 +127,7 @@ if (gene == "TpMT2"){
 rm(abund,aln,env,taxa)
 
 ################################################################################
-### combine metaG DSYB and TpMT2 results for plotting
+### combine metaT DSYB and TpMT2 results for plotting
 # Create a df of stations common (or unique to) each gene
 stn_tot_abund <- as.data.frame(unique(sort(c(colnames(DSYB_abund),colnames(TpMT2_abund)))))
 colnames(stn_tot_abund) <- "station"

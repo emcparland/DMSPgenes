@@ -1,6 +1,8 @@
 # Survey of DMSP synthesis genes
 
-# prokaryote searches
+# prokaryote searches in NCBI ref seq genomes
+
+Create a local conda environment with blast to access the NCBI db remotely.
 
 ## tblastn ref seq genomes at ncbi
 
@@ -109,6 +111,7 @@ Download the MMETSP proteins
 ```wget https://zenodo.org/record/3247846/files/mmetsp_dib_trinity2.2.0_pep_zenodo.tar.gz```
 
 Compile a fasta file of all the proteins. I add the MMETSP identifier at the beginning of each transcript so I can identify them after they are compiled:
+
 ```ls MMETSP* | while read headername```
 ```do```
 	```name=$(awk '{print FILENAME}' $headername |head -n1 | awk -F'.' '{print $1}')```
@@ -117,6 +120,7 @@ Compile a fasta file of all the proteins. I add the MMETSP identifier at the beg
 
 ### Search proteins
 ```hmmsearch --tblout TpMT2.out TpMT2.hmm mmetsp_pep.fa```
+
 ```hmmsearch --tblout DSYB.out DSYB.hmm mmetsp_pep.fa```
 
 ### removing some of the extra table parts and add back headers
@@ -142,6 +146,7 @@ Compile a fasta file of all the proteins. I add the MMETSP identifier at the beg
 
 ### create corresponding fasta file
 First create a temporary searchable file (the original pep file has multiple lines of sequences)
+
 ```tr -d '\n' < mmetsp_pep.fa > tmp2```
 ```tr ">" "\n>" <tmp2 > tmp3```
 ```sed -e 's/)/)\n/g' tmp3 > pep_search```
@@ -154,13 +159,16 @@ Add a carot
 Repeat for DSYB
 
 Make sure to include the manual searches. This command will grab your headers and sequences, remove any "-" in the MMETSP sequences, and print a fasta file with >
+
 ```cat extra_TpMT2_sig.txt  | awk -F "\t" '{print $18,$17}' | awk '{gsub(/-/,"",$2)}1'|awk 'BEGIN {OFS="\n"}{print ">"$1,$2}' >> TpMT2_hmmuniqsp.fa```
 
 # Recursive blast search
 We wanted to check if any of the MMETSP sequences could be prokaryote contamination. To do this, I recursively searched each of the significant TpMT2 and DSYB eukaryotic sequences against the nr NCBI database, kept the top 100 hits for each sequence and determined if they were primarily prokaryote or eukaryote.
 
-```gene=TpMT2```
+```gene=TpMT2``` (repeat with gene=DSYB)
+
 ```grep "^>" "$gene"_hmmuniqsp.fa > headers.txt```
+
 ```awk '{print $0}' headers.txt | while read headername```
 ```do```
 ```grep -A1 "$headername" "$gene"_hmmuniqsp.fa > tmp.fa```
@@ -168,14 +176,21 @@ We wanted to check if any of the MMETSP sequences could be prokaryote contaminat
 ```cat result.txt >> "$gene"_reblast.txt```
 
 ### Assign taxonomy 
-I usedthe R package[Taxonomzir](https://cran.r-project.org/web/packages/taxonomizr/index.html). This requires some previous setup and long downloads.
+I used the R package[Taxonomzir](https://cran.r-project.org/web/packages/taxonomizr/index.html). This requires some previous setup and long downloads.
+
 ```library(taxonomizr)```
+
 ```results <- read.delim("TpMT2_reblast.txt", header = F,stringAsFactors=F)```
+
 ```accessid <- as.vector(results$accession)```
+
 ```taxaId <- accessionToTaxa(accessid, 'accessionTaxa.sql')```
+
 ```taxa <- getTaxonomy(taxaId,'accessionTaxa.sql')```
+
 ```df <- cbind(accessid, taxaId,taxa)```
 ```write.csv(df,file = "TpMT2_reblasttaxa.csv")```
+
 A few id's are missing. NCBI's [batch entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) is helpful for checking those manually. Finally, remove any results deemed contamination by the analysis.
 
 # Create a key for all of the mmetsp species

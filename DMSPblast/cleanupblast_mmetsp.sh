@@ -9,8 +9,8 @@ cut -f1-15 $FILE > alnresults
 paste alnresults q seq > tmp
 rm alnresults q seq
 
-# filter to keep anything with evalue <1e-30 and query length >=70%
-awk '$13 <=1e-30 && $16 >=0.7' tmp > tmp_filter
+# filter
+awk '$13 <=2e-15 && $16 >=0.75' tmp > tmp_filter
 rm tmp
 
 # transcribe blastnames

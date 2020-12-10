@@ -1,7 +1,5 @@
 
-Install: [muscle](https://www.drive5.com/muscle/) with conda and [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/)
-
-# Step 1: Align all sequences with muscle
+# Step 1: Align all sequences with [muscle](https://www.drive5.com/muscle/) 
 
 ```cat DSYBall_hmmuniqsp.fa TpMT2_hmmuniqsp.fa > all_final.fa```
 
@@ -33,7 +31,7 @@ Convert to phylip file for raxml
 ```perl Fasta2Phylip.pl all_align_final.fa all_align_final.phy```
 ```perl Fasta2Phylip.pl all_pheno_align_final.fa all_pheno_align_final.phy```
 
-# Step 3: Build tree with RAXML
+# Step 3: Build tree with [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/)
 
 ## First construct the ML tree, using the AUTO function which automiatcally determines the best protein model with respect to the likelihood on a fixed, reasonable tree
 Note: I tried to include outgroup here but I don't think it liked the name and still trying to figure out why. Either way, outgroup effects drawing not actual tree
